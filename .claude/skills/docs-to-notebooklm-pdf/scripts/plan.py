@@ -26,13 +26,32 @@ def main():
 
     P = [json.loads(l) for l in open(a.pages, encoding='utf-8')]
     P.sort(key=lambda p: p['i'])
+    if any(p['sec'] for p in P):
+        # TOC-ordered input: an unnumbered entry (index, appendix, generated listing) belongs to the
+        # chapter before it; otherwise it would split that chapter into several groups.
+        prev = None
+        for p in P:
+            if not p['sec'] and prev is not None:
+                p['group'] = prev
+            prev = p['group']
+        # front matter (leading unnumbered pages and chapter 0) joins the first real chapter
+        k = 0
+        while k < len(P) and (not P[k]['sec'] or P[k]['group'] == '0'):
+            k += 1
+        if 0 < k < len(P) and P[k]['group'].isdigit():
+            first = P[k]['group']
+            front = f"00-{int(first):02d}"
+            for p in P:
+                if p['group'] == first or p['i'] < P[k]['i'] or p['group'] == '0':
+                    p['group'] = front
     groups, gtitle = [], {}
     for p in P:
         if not groups or groups[-1][0] != p['group']:
             groups.append([p['group'], []])
         groups[-1][1].append(p)
         if p['group'] not in gtitle:
-            gtitle[p['group']] = p['title'] if p['sec'] and '.' not in p['sec'] else p['group']
+            gtitle[p['group']] = (p['title'] if p['sec'] and '.' not in p['sec']
+                                  else 'Front-Matter' if p['group'].startswith('00-') else p['group'])
 
     def build(cap, merge):
         units = []  # list of (label, title, pages)
@@ -84,13 +103,15 @@ def main():
         label = p['label'] if len(p['label']) <= 12 else p['label'][:12]
         suffix = f"_part{p['part']}-of-{p['of']}" if p['of'] > 1 else ''
         lab = re.sub(r'[^A-Za-z0-9-]+', '-', label)
+        if re.fullmatch(r'\d+(-\d+)*', lab):  # numeric chapter label -> chNN, as in the naming convention
+            lab = 'ch' + '-'.join(x.zfill(2) for x in lab.split('-'))
         mid = slug if slug.lower() == lab.lower() else f'{lab}_{slug}'
         p['file'] = f"{a.name}_{n:02d}_{mid}{suffix}.pdf"
         span = f" (sections {p['first']} – {p['last']})" if p['first'] != p['last'] else ''
         p['doc_title'] = f"{a.name} — {p['title']}" + (f" — part {p['part']} of {p['of']}" if p['of'] > 1 else '') + span
         if p['max_page_words'] > cap:
             notes.append(f"{p['file']}: a single page has {p['max_page_words']} words (> cap); it cannot be split on page boundaries")
-    json.dump({'name': a.name, 'cap': cap, 'notes': notes, 'parts': parts}, open(a.out, 'w'), ensure_ascii=False, indent=1)
+    json.dump({'name': a.name, 'cap': cap, 'notes': notes, 'parts': parts}, open(a.out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for p in parts:
         print(f"{p['file']}  pages={p['pages']} words={p['words']}  {p['first']} .. {p['last']}")
     print(f'{len(parts)} PDFs, total words {sum(p["words"] for p in parts)}, cap {cap}')

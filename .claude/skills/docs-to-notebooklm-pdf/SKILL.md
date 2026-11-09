@@ -69,7 +69,10 @@ python plan.py pages.jsonl parts.json --name DOCNAME [--cap 300000] [--max-files
 Chapters (top-level TOC numbers, or top folders) stay together, so each PDF is a coherent topic:
 this makes it easier for the user to pick or deselect sources in NotebookLM. A chapter over the cap
 is split into equal parts on page boundaries. Small chapters are merged only when the file count
-would otherwise exceed the limit. Read the printed `NOTE:` lines and pass anything important to the user,
+would otherwise exceed the limit. With a TOC, unnumbered entries (indexes, generated listings) are
+attached to the preceding chapter, and front matter (leading unnumbered pages and chapter 0) is merged
+with the first chapter as `ch00-01_Front-Matter`. Numeric chapter labels become `chNN` in file names.
+Read the printed `NOTE:` lines and pass anything important to the user,
 for example if a single page alone exceeds the cap or the corpus needs more than one notebook.
 
 ### 4. Render

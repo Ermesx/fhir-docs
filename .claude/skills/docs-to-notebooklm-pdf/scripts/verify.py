@@ -35,7 +35,7 @@ def main():
         pages[p['i']] = p
     only = {int(x) for x in a.only.split(',') if x}
     cache_path = os.path.join(a.outdir, '.verify_cache.json')
-    cache = json.load(open(cache_path)) if os.path.exists(cache_path) else {}
+    cache = json.load(open(cache_path, encoding='utf-8')) if os.path.exists(cache_path) else {}
     problems, rows = [], []
     covered = []
     for n, part in enumerate(plan['parts'], 1):
@@ -57,7 +57,7 @@ def main():
                                    src_pages=len(expect), missing=missing[:5], n_missing=len(missing),
                                    first=part['first'], last=part['last'])
         print(f"{n:02d} {part['file']}: {words} words, {mb:.2f} MB, {len(r.pages)} PDF pages, missing bookmarks {len(missing)}", flush=True)
-    json.dump(cache, open(cache_path, 'w'))
+    json.dump(cache, open(cache_path, 'w', encoding='utf-8'))
     if only:
         print('partial run; rerun without --only (results are cached) to get the full report')
         return
