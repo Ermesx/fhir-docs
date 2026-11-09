@@ -16,6 +16,7 @@ Each source folder contains the original input (ZIP or other format), the genera
 | Source | Notebook |
 |--------|----------|
 | FHIR R4 (v4.0.1) | [NotebookLM](https://notebook.google.com/notebook/dcef5592-1942-40e0-aa70-d0ecf271b001) |
+| FHIR STU3 (v3.0.2) | [NotebookLM](https://notebook.google.com/notebook/d4babeed-2426-4850-82cc-0e7665c60dc2) |
 
 ## Adding a new source
 
