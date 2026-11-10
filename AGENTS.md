@@ -8,6 +8,7 @@ A repository for storing FHIR documentation and generating derived documents fro
 
 - `official-docs/`: official HL7 FHIR documentation, one folder per FHIR version.
 - `vendor-docs/`: FHIR implementation documentation published by EHR vendors, one folder per vendor and version (e.g. Epic, Meditech, Oracle Health).
+- `.agents/skills/`: agent-agnostic project skills (source of truth). `.claude/skills/<name>` is a symlink to it, because Claude Code reads only `.claude/skills/`.
 
 ## Naming Conventions
 
@@ -19,7 +20,7 @@ A repository for storing FHIR documentation and generating derived documents fro
 
 ## Generating PDFs
 
-For every new documentation source (another FHIR version, Epic, Meditech, Oracle, etc.), generate the PDFs with the project skill `docs-to-notebooklm-pdf` (`.claude/skills/docs-to-notebooklm-pdf/`). Do not write ad-hoc conversion scripts.
+For every new documentation source (another FHIR version, Epic, Meditech, Oracle, etc.), generate the PDFs with the project skill `docs-to-notebooklm-pdf` (`.agents/skills/docs-to-notebooklm-pdf/`). Do not write ad-hoc conversion scripts.
 
 - Input: a ZIP or folder of HTML/Markdown/text, already downloaded or mirrored. The skill does not fetch anything.
 - Output goes into the source's own folder next to the original input, together with `REPORT.md` (English, Markdown; this exact name).
